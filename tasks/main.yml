@@ -1,0 +1,36 @@
+---
+
+- name: Add Elastic APT key
+  apt_key:
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+- name: Add Elastic APT repo
+  apt_repository:
+    repo: "deb https://artifacts.elastic.co/packages/{{ logstash_version }}.x/apt stable main"
+    filename: "elastic"
+
+- name: Install logstash
+  apt:
+    name: logstash
+
+- name: Copy logstash configuration
+  template:
+    src: logstash.yml.j2
+    dest: /etc/logstash/logstash.yml
+  notify: restart logstash
+
+- name: Add logstash pipelines
+  notify: restart logstash
+  template:
+    src: '{{ item }}'
+    dest: /etc/logstash/conf.d/{{ item | basename | regex_replace('\.j2','') }}
+  with_items:
+    - conf.d/01-input.conf.j2
+    - conf.d/02-filter.conf.j2
+    - conf.d/03-output.conf.j2
+
+- name: Enable and start logstash service
+  service:
+    name: logstash
+    state: started
+    enabled: true

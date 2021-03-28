@@ -1,0 +1,19 @@
+output {
+  if [@metadata][beat] == "filebeat" {
+    elasticsearch {
+      hosts => ["{{ logstash_output_es }}"]
+      index => "%{[@metadata][beat]}-%{[agent][name]}-%{index}-%{+YYYY.MM.dd}"
+    }
+  } else if [@metadata][beat] == "journalbeat" {
+    elasticsearch {
+      hosts => ["{{ logstash_output_es }}"]
+      index => "%{[@metadata][beat]}-%{[host][hostname]}-%{+YYYY.MM.dd}"
+    }
+  } else {
+    elasticsearch {
+      hosts => ["{{ logstash_output_es }}"]
+      index => "%{[@metadata][beat]}-lost-%{+YYYY.MM.dd}"
+    }
+  }
+  #stdout { codec => rubydebug }
+}

@@ -1,0 +1,8 @@
+---
+
+logstash_version: 7
+logstash_path_logs: /var/log/logstash
+logstash_path_data: /var/lib/logstash
+
+logstash_input_beats_port: 5044
+logstash_output_es: localhost:9200

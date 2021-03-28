@@ -1,0 +1,72 @@
+filter {
+  if [fields][index] == "nginx" {
+    mutate {
+      add_field => { "index" => "nginx" }
+    }
+    grok {
+      match => [ "message" , '%{HTTPD_COMBINEDLOG}']
+    }
+  }
+  if [fields][index] == "caddy" {
+    json {
+      source => "message"
+    }
+    mutate {
+      add_field => { "index" => "caddy" }
+      remove_field => [ "message" ]
+    }
+  }
+  if [fields][index] == "php-fpm" {
+    mutate {
+      add_field => { "index" => "php-fpm" }
+    }
+    grok {
+      match => [ "message" , '%{GREEDYDATA}']
+    }
+  }
+  if [fields][index] == "cloud-init" {
+    mutate {
+      add_field => { "index" => "cloud-init" }
+    }
+    grok {
+      match => [ "message" , '%{GREEDYDATA}']
+    }
+  }
+  if [fields][index] == "dpkg" {
+    mutate {
+      add_field => { "index" => "dpkg" }
+    }
+    grok {
+      match => [ "message" , '%{GREEDYDATA}']
+    }
+  }
+  if [fields][index] == "auth" {
+    mutate {
+      add_field => { "index" => "auth" }
+    }
+    grok {
+      match => [ "message" , '%{GREEDYDATA}']
+    }
+  }
+  if [fields][index] == "kern" {
+    mutate {
+      add_field => { "index" => "kern" }
+    }
+    grok {
+      match => [ "message" , '%{GREEDYDATA}']
+    }
+  }
+  if [fields][index] == "redis" {
+    mutate {
+      add_field => { "index" => "redis" }
+    }
+    grok {
+      match => [ "message" , '%{GREEDYDATA}']
+    }
+  }
+  if ![fields][index] and [@metadata][beat] == "filebeat" {
+    mutate {
+      add_field => { "index" => "lost" }
+    }
+  }
+}
